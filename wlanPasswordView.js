@@ -8,9 +8,9 @@ log(times());
 a[2] = cash(a[0]);
 a[0] = [];
 a[1] = [];
-for (let i = 0; i < a[1].length / 2; i++) {
-    a[0][i] = a[1][i * 2];
-    a[2][i] = a[1][i * 2 + 1];
+for (let i = 0; i < a[2].length / 2; i++) {
+    a[0][i] = a[2][i * 2];
+    a[1][i] = a[2][i * 2 + 1];
 }
 a.pop();
 /* 数据格式：
@@ -31,7 +31,7 @@ dialogs.select('查看密码：', a[0], (i) => {
 function cash(t) { // 字符处理
     let p = /\w+=\{(\s+\w+=[^\n]+)+\s+\}/g;
     t = t.match(p);
-    p = [/ssid=[^\n]+/, /psk=[^\n]+/];
+    p = [/\sssid=[^\n]+/, /\spsk=[^\n]+/];
     let network = [];
     t.forEach((i) => {
         network.push(i.match(p[0]).join(''));
