@@ -1,4 +1,4 @@
-let path = "/storage/emulated/0/fooViewSave/Screenshot_20180317152109.jpg";
+let path = ""; // 文件路径
 path = fileTOBase(path);
 log(path);
 
