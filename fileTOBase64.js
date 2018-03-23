@@ -1,4 +1,4 @@
-let path = ""; // 文件路径
+let path = " "; // 文件路径
 path = fileTOBase(path);
 log(path);
 
