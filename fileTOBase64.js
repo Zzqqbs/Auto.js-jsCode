@@ -1,12 +1,7 @@
 "ui";
 let path = "/storage/emulated/0/fooViewSave/Screenshot_20180317152109.jpg";
 path = fileTOBase(path);
-//log(path);
-ui.layout(
-    <frame>
-        <img src={path} />
-    </frame>
-)
+log(path);
 
 function fileTOBase(p) {
     let data = files.readBytes(p);
