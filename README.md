@@ -1,6 +1,7 @@
 # Auto.js-jsCode
 目录
 ===
-fileTOBase64.js      将文件编码为 Base64
-
-wlanPasswordView.js  查看已保存 WiFi 密码
+| 文件名                | 说明                |
+|-----------------------|--------------------|
+| fileTOBase64.js       | 文件转 Base64       |
+| wlanPasswordView.js   | 查看已保存 WiFi 密码 |
