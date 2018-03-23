@@ -1,4 +1,3 @@
-"ui";
 let path = "/storage/emulated/0/fooViewSave/Screenshot_20180317152109.jpg";
 path = fileTOBase(path);
 log(path);
