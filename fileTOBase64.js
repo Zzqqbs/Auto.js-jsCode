@@ -48,13 +48,12 @@ function bitToBase(b) {
         base = '';
     // 分组（6 位一组）
     for (let i = 0; i < b.length; i += 6) {
-        bit.push(b.subsfr(i, 6));
+        bit.push(b.substr(i, 6));
     }
     // 建立编码对照表
     const key = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890+/".split('');
     bit.forEach((i) => {
-        i = parseInt(i, 2);
-        base += key[i];
+        base += key[parseInt(i, 2)];
     });
     return base;
 }
@@ -63,6 +62,7 @@ function fileType(f) {
     // 文件后缀列表
     const img = ['jpeg', 'png', 'gif'],
         txt = ['css', 'html', 'js'];
+    f = files.getExtension(f);
     if (f == 'jpg') f = 'jpeg';
     for (let i = 0; i < img.length; i++) {
         if (f == img[i]) {
