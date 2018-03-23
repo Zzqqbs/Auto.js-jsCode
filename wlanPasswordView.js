@@ -46,14 +46,22 @@ dialogs.select('查看密码：', a[0], (i) => {
     if (i > -1) {
         if (!a[1][i]) alert('无密码！');
         else confirm('复制密码：', a[1][i], (j) => {
-            if (j) setClip('名称：' + a[0][i] +'\n密码：' + a[1][i]);
+            if (j) setClip('名称：' + a[0][i] + '\n密码：' + a[1][i]);
         });
     }
 });
 
-function times() {
+function decode(t) {
+    t = t.split('');
+    for (let i = 0; i < t.length; i += 2) {
+        t[i] = '%' +t[i];
+    }
+    return decodeURI(t.join(''));
+}
+
+function times() { // 耗时
     let d = [new Date().getTime()];
-    d[1] = (d[0] -D) / 1000;
+    d[1] = (d[0] - D) / 1000;
     D = d[0];
     return d[1];
 }
