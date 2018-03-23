@@ -5,30 +5,7 @@ shell('cp ' + a[0] + ' ' + a[1], !0);
 a[0] = files.read(a[1]);
 files.remove(a[1]);
 log(times());
-// 字符处理
-a[1] = /\w+=\{(\s+\w+=[^\n]+)+\s+\}/g;
-a[1] = a[0].match(a[1]);
-a[0] = [/ssid=[^\n]+/, /psk=[^\n]+/];
-a[1].forEach((i) => {
-    a[0].push(i.match(a[0][0]).join(''));
-    i = i.match(a[0][1]);
-    if (i) i = i.join('');
-    a[0].push(i);
-});
-a[0].shift();
-a[0].shift();
-a[1] = [];
-a[0].forEach((i) => {
-    if (i) {
-        if (i.substr(-1) == '"') {
-            i = i.split('"')[1];
-        } else {
-            i = i.split('=')[1];
-            i = decode(i);
-        }
-    }
-    a[1].push(i);
-});
+a[1] = cash(a[0]);
 a[0] = [];
 a[2] = [];
 for (let i = 0; i < a[1].length / 2; i++) {
@@ -51,10 +28,33 @@ dialogs.select('查看密码：', a[0], (i) => {
     }
 });
 
+function cash(t) { // 字符处理
+    let p = /\w+=\{(\s+\w+=[^\n]+)+\s+\}/g;
+    t = t.match(p);
+    p = [/ssid=[^\n]+/, /psk=[^\n]+/];
+    let network = [];
+    t.forEach((i) => {
+        network.push(i.match(p[0]).join(''));
+        i = i.match(p[1]);
+        if (i) i = i.join('');
+        network.push(i);
+    });
+    let ssid_psk = [];
+    network.forEach((i) => {
+        if (i) {
+            if (i.substr(-1) == '"') {
+                i = i.split('"')[1];
+            } else i = decode(i.split('=')[1]);
+        }
+        ssid_psk.push(i);
+    });
+    return ssid_psk;
+}
+
 function decode(t) {
     t = t.split('');
     for (let i = 0; i < t.length; i += 2) {
-        t[i] = '%' +t[i];
+        t[i] = '%' + t[i];
     }
     return decodeURI(t.join(''));
 }
