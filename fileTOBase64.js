@@ -1,12 +1,6 @@
-"ui";
-let path = "/storage/emulated/0/fooViewSave/Screenshot_20180317152109.jpg";
+let path = "/storage/emulated/0/fooViewSave/Screenshot_20180318180855.jpg";
 path = fileTOBase(path);
-//log(path);
-ui.layout(
-    <frame>
-        <img src={path} />
-    </frame>
-)
+log(path);
 
 function fileTOBase(p) {
     let data = files.readBytes(p);
@@ -32,7 +26,7 @@ function byteToBit(b) {
         if (i.length < 8) {
             i = i.split('');
             i.reverse();
-            for (let j = i.length; i < 8; i++) {
+            for (let j = i.length; j < 8; j++) {
                 i[j] = '0';
             }
             i.reverse();
