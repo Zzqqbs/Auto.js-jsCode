@@ -5,14 +5,14 @@ shell('cp ' + a[0] + ' ' + a[1], !0);
 a[0] = files.read(a[1]);
 files.remove(a[1]);
 log(times());
-a[1] = cash(a[0]);
+a[2] = cash(a[0]);
 a[0] = [];
-a[2] = [];
+a[1] = [];
 for (let i = 0; i < a[1].length / 2; i++) {
     a[0][i] = a[1][i * 2];
     a[2][i] = a[1][i * 2 + 1];
 }
-a[1] = a.pop();
+a.pop();
 /* 数据格式：
    ssid a[0][i]
    psk  a[1][i]
