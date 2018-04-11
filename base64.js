@@ -160,7 +160,7 @@ function base642File(path, base) {
     files.writeBytes(path, data);
 }
 
-function string2Base(str) {
+function string2Base(str) { // 未完成
     let hex = [];
     str = str.split('');
     for (let i = 0; i < str.length; i++) hex[i] = str[i].charCodeAt(0);
