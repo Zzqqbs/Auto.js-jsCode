@@ -1,6 +1,6 @@
 //'use strict';
 
-if (typeof files == 'undefined') {
+if (typeof files === 'undefined') {
     const fs = require('fs');
     var files = {
         writeBytes: function (path, arr) {
@@ -184,9 +184,11 @@ function unicode2UTF8(uni) {
         } else if (i < 0x200000) {
             utf.push(0xf0 | i >> 18, a(i, 12), a(i, 6), a(i, 0));
         } else if (i < 0x4000000) {
-            utf.push(0xf8 | i >> 24, a(i, 18), a(i, 12), a(i, 6), a(i, 0));
+            utf.push(0xf0 | i >> 24, a(i, 18), a(i, 12), a(i, 6), a(i, 0));
+        } else if (i < 0x80000000) {
+            utf.push(0xf0 | i >> 30, a(i, 24), a(i, 18), a(i, 12), a(i, 6), a(i, 0));
         } else {
-            utf.push(0xfc | i >>> 30, a(i, 24), a(i, 18), a(i, 12), a(i, 6), a(i, 0));
+            er('错误值：' + i);
         }
     });
     return utf;
@@ -200,20 +202,62 @@ function string2Base(str) {
     return bytes2Base(unicode2UTF8(string2Unicode(str)));
 }
 
+/**
+ * Unicode 转文本
+ * @param {number[]} u Unicode
+ */
 function unicode2String(u) {
-    let s = [];
-    // 未完成
+    let s = '';
+    u.forEach((i) => {
+        s += String.fromCharCode(i);
+    });
     return s;
 }
 
+/**
+ * UTF-8 转 Unicode
+ * @param {number[]} utf 字节数组
+ */
 function utf2Unicode(utf) {
-    let uni = [];
-    // 未完成
+    const a = function (u, b) {
+        return (u & 0x3f) << b;
+    }
+    let i = 0,
+        uni = [];
+    while (i < utf.length) {
+        if (utf[i] < 0x80) {
+            uni.push(utf[i]);
+            i++;
+        } else if (utf[i] < 0xc0) {
+            er('错误值：' + utf[i]);
+        } else if (utf[i] < 0xe0) {
+            uni.push((utf[i] & 0x1f) << 6 | a(utf[i + 1], 0));
+            i += 2;
+        } else if (utf[i] < 0xf0) {
+            uni.push((utf[i] & 0xf) << 12 | a(utf[i + 1], 6) | a(utf[i + 2], 0));
+            i += 3;
+        } else if (utf[i] < 0xf8) {
+            uni.push((utf[i] & 7) << 18 | a(utf[i + 1], 12) | a(utf[i + 2], 6) | a(utf[i + 3], 0));
+            i += 4;
+        } else if (utf[i] < 0xfc) {
+            uni.push((utf[i] & 3) << 24 | a(utf[i + 1], 18) | a(utf[i + 2], 12) | a(utf[i + 3], 6) | a(utf[i + 4], 0));
+            i += 5;
+        } else if (utf[i] < 0xfe) {
+            uni.push((utf[i] & 1) << 30 | a(utf[i + 1], 24) | a(utf[i + 2], 28) | a(utf[i + 3], 12) | a(utf[i + 4], 6) | a(utf[i + 5], 0));
+            i += 6;
+        } else {
+            er('错误值：' + utf[i]);
+        }
+    }
     return uni;
 }
 
+/**
+ * 文本解码
+ * @param {string} base Base64 字符串
+ */
 function base2String(base) {
-    return unicode2String(uft2Unicode(base2Byte(base))).join('');
+    return unicode2String(utf2Unicode(base2Byte(base)));
 }
 
 module.exports = {
@@ -223,6 +267,6 @@ module.exports = {
     },
     decode: {
         file: base642File,
-        // string: base2String
+        string: base2String
     }
 };
