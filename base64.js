@@ -50,13 +50,17 @@ function bytes2Base(d) {
     let b = [];
     if (!d) er('参数不是字节数组！');
     for (let i = 0; i < d.length; i += 3) {
-        //threads.start(function () {
         hex2Base(d[i], d[i + 1], d[i + 2]).forEach((j, k) => {
             b[i / 3 * 4 + k] = j;
         });
-        //});
     }
-    return b;
+    switch (d.length % 3) {
+        case 1:
+            b[b.length - 2] = '=';
+        case 2:
+            b[b.length - 1] = '=';
+    }
+    return b.join('');
 }
 
 /**
@@ -84,16 +88,7 @@ function fileType(f) {
  * @param {string} path 被编码文件路径
  */
 function file2Base64(path) {
-    let data = files.readBytes(path),
-        base = bytes2Base(data);
-    // 修改头尾信息
-    switch (data.length % 3) {
-        case 1:
-            base[base.length - 2] = '=';
-        case 2:
-            base[base.length - 1] = '=';
-    }
-    return "data:" + fileType(path) + ";base64," + base.join('');
+    return "data:" + fileType(path) + ";base64," + bytes2Base(files.readBytes(path));
 }
 
 /**
@@ -121,9 +116,9 @@ function base2Hex(a, b, c, d) {
     b = key[b];
     c = key[c];
     return [
-        (key[a] << 2) + (b >> 4),
-        ((b << 4) + (c >> 2)) & 0xff,
-        ((c << 6) + key[d]) & 0xff
+        key[a] << 2 | b >> 4,
+        (b << 4 | c >> 2) & 0xff,
+        (c << 6 | key[d]) & 0xff
     ];
 }
 
@@ -139,6 +134,12 @@ function base2Byte(b) {
             d[i / 4 * 3 + k] = j;
         });
     }
+    switch ('=') { // 去尾
+        case b.slice(-2, 1):
+            d.pop();
+        case b.slice(-1, 1):
+            d.pop();
+    }
     return d;
 }
 
@@ -148,28 +149,80 @@ function base2Byte(b) {
  * @param {string} base Base64 字符串
  */
 function base642File(path, base) {
-    let data = [];
     base = base.split(',')[1]; // 掐头
-    data = base2Byte(base);
-    switch ('=') { // 去尾
-        case base.slice(-2, 1):
-            data.pop();
-        case base.slice(-1, 1):
-            data.pop();
-    }
-    files.writeBytes(path, data);
+    files.writeBytes(path, base2Byte(base));
 }
 
-function string2Base(str) { // 未完成
-    let hex = [];
-    str = str.split('');
-    for (let i = 0; i < str.length; i++) hex[i] = str[i].charCodeAt(0);
+/**
+ * 文本转 Unicode
+ * @param {string} s 文本
+ */
+function string2Unicode(s) {
+    let h = [];
+    for (let i = 0; i < s.length; i++) {
+        h[i] = s.charCodeAt(i);
+    }
+    return h;
+}
 
-    return hex;
+/**
+ * Unicode 转 UTF-8
+ * @param {number[]} uni Unicode 编码，按字存放
+ */
+function unicode2UTF8(uni) {
+    const a = function (u, b) {
+        return 0x80 | u >> b & 0x3f;
+    };
+    let utf = [];
+    uni.forEach((i) => {
+        if (i < 0x80) {
+            utf.push(i);
+        } else if (i < 0x800) {
+            utf.push(0xc0 | i >> 6, a(i, 0));
+        } else if (i < 0x10000) {
+            utf.push(0xe0 | i >> 12, a(i, 6), a(i, 0));
+        } else if (i < 0x200000) {
+            utf.push(0xf0 | i >> 18, a(i, 12), a(i, 6), a(i, 0));
+        } else if (i < 0x4000000) {
+            utf.push(0xf8 | i >> 24, a(i, 18), a(i, 12), a(i, 6), a(i, 0));
+        } else {
+            utf.push(0xfc | i >>> 30, a(i, 24), a(i, 18), a(i, 12), a(i, 6), a(i, 0));
+        }
+    });
+    return utf;
+}
+
+/**
+ * 文本编码
+ * @param {string} str 输入字符串
+ */
+function string2Base(str) {
+    return bytes2Base(unicode2UTF8(string2Unicode(str)));
+}
+
+function unicode2String(u) {
+    let s = [];
+    // 未完成
+    return s;
+}
+
+function utf2Unicode(utf) {
+    let uni = [];
+    // 未完成
+    return uni;
+}
+
+function base2String(base) {
+    return unicode2String(uft2Unicode(base2Byte(base))).join('');
 }
 
 module.exports = {
-    file2Base: file2Base64,
-    base2File: base642File,
-    str2Base: string2Base // 未完成
+    encode: {
+        file: file2Base64,
+        string: string2Base
+    },
+    decode: {
+        file: base642File,
+        // string: base2String
+    }
 };
