@@ -134,12 +134,8 @@ function base2Byte(b) {
             d[i / 4 * 3 + k] = j;
         });
     }
-    switch ('=') { // 去尾
-        case b.slice(-2, 1):
-            d.pop();
-        case b.slice(-1, 1):
-            d.pop();
-    }
+    if (b.slice(-1) == '=') d.pop();
+    if (b.slice(-2, 1) == '=') d.pop();
     return d;
 }
 
@@ -177,7 +173,7 @@ function unicode2UTF8(uni) {
     uni.forEach((i) => {
         if (i < 0x80) {
             utf.push(i);
-        } else if (i < 0x800) {
+        } else if (i < 0x800) { 
             utf.push(0xc0 | i >> 6, a(i, 0));
         } else if (i < 0x10000) {
             utf.push(0xe0 | i >> 12, a(i, 6), a(i, 0));
@@ -188,7 +184,7 @@ function unicode2UTF8(uni) {
         } else if (i < 0x80000000) {
             utf.push(0xf0 | i >> 30, a(i, 24), a(i, 18), a(i, 12), a(i, 6), a(i, 0));
         } else {
-            er('错误值：' + i);
+            er('错误值：0x' + i.toString(16));
         }
     });
     return utf;
@@ -225,28 +221,26 @@ function utf2Unicode(utf) {
     let i = 0,
         uni = [];
     while (i < utf.length) {
-        if (utf[i] < 0x80) {
+        if (utf[i] >> 7 == 0) {
             uni.push(utf[i]);
-            i++;
-        } else if (utf[i] < 0xc0) {
-            er('错误值：' + utf[i]);
-        } else if (utf[i] < 0xe0) {
+            i += 1;
+        } else if (utf[i] >> 5 == 6) {
             uni.push((utf[i] & 0x1f) << 6 | a(utf[i + 1], 0));
             i += 2;
-        } else if (utf[i] < 0xf0) {
+        } else if (utf[i] >> 4 == 0xe) {
             uni.push((utf[i] & 0xf) << 12 | a(utf[i + 1], 6) | a(utf[i + 2], 0));
             i += 3;
-        } else if (utf[i] < 0xf8) {
+        } else if (utf[i] >> 3 == 0x1e) {
             uni.push((utf[i] & 7) << 18 | a(utf[i + 1], 12) | a(utf[i + 2], 6) | a(utf[i + 3], 0));
             i += 4;
-        } else if (utf[i] < 0xfc) {
+        } else if (utf[i] >> 2 == 0x3e) {
             uni.push((utf[i] & 3) << 24 | a(utf[i + 1], 18) | a(utf[i + 2], 12) | a(utf[i + 3], 6) | a(utf[i + 4], 0));
             i += 5;
-        } else if (utf[i] < 0xfe) {
+        } else if (utf[i] >> 1 == 0x7e) {
             uni.push((utf[i] & 1) << 30 | a(utf[i + 1], 24) | a(utf[i + 2], 28) | a(utf[i + 3], 12) | a(utf[i + 4], 6) | a(utf[i + 5], 0));
             i += 6;
         } else {
-            er('错误值：' + utf[i]);
+            er('错误值：0x' + utf[i].toString(16));
         }
     }
     return uni;
